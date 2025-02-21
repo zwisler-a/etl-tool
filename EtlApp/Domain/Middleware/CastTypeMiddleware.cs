@@ -12,50 +12,45 @@ public class CastTypeMiddleware : IMiddleware
 
     public ReportData Process(ReportData reportData, PipelineExecutionContext context)
     {
-        var newDataTable = reportData.Data.Clone(); // Clone the structure of the original DataTable
+        var newDataTable = new DataTable();
 
-        // Remove the ReadOnly property from each column in the new DataTable
-        foreach (DataColumn column in newDataTable.Columns)
-        {
-            column.ReadOnly = false;
-        }
-
-        // Copy the rows from the original DataTable to the new DataTable
-        foreach (DataRow originalRow in reportData.Data.Rows)
-        {
-            newDataTable.ImportRow(originalRow);
-        }
-
+        // Adjust column data types
         foreach (var (columnName, columnConfig) in reportData.Columns)
         {
-            var columnValues = reportData.Data.AsEnumerable()
-                .Select(row => row[columnName])
-                .ToList();
-
-            var castedValues = CastColumnType(columnValues, columnConfig.SourceType);
-
-            for (var i = 0; i < columnValues.Count; i++)
-            {
-                newDataTable.Rows[i][columnName] = castedValues[i];
-            }
+            var columnType = GetColumnType(columnConfig.SourceType);
+            newDataTable.Columns.Add(columnName, columnType);
         }
 
-        // Create a new ReportData with the new DataTable
+        // Copy data with type casting
+        foreach (DataRow originalRow in reportData.Data.Rows)
+        {
+            var newRow = newDataTable.NewRow();
+            foreach (var (columnName, columnConfig) in reportData.Columns)
+            {
+                newRow[columnName] = ConvertValue(originalRow[columnName], columnConfig.SourceType);
+            }
+
+            newDataTable.Rows.Add(newRow);
+        }
+
         return reportData with { Data = newDataTable };
     }
 
-
-    private List<object> CastColumnType(List<object> columnValues, ColumnType targetType)
+    private Type GetColumnType(ColumnType targetType) => targetType switch
     {
-        return targetType switch
-        {
-            ColumnType.Int => columnValues.Select(value => Convert.ToInt32(value)).ToList(),
-            ColumnType.Decimal => columnValues.Select(value => value is double ? value : Convert.ToDouble(value))
-                .ToList(),
-            ColumnType.DateTime => columnValues.Select(value => value is DateTime ? value : Convert.ToDateTime(value))
-                .ToList(),
-            ColumnType.String => columnValues.Select(value => value).ToList(),
-            _ => throw new Exception($"Unsupported ColumnType {targetType}")
-        };
-    }
+        ColumnType.Int => typeof(int),
+        ColumnType.Decimal => typeof(double),
+        ColumnType.DateTime => typeof(DateTime),
+        ColumnType.String => typeof(string),
+        _ => throw new Exception($"Unsupported ColumnType {targetType}")
+    };
+
+    private object ConvertValue(object value, ColumnType targetType) => (targetType switch
+    {
+        ColumnType.Int => Convert.ToInt32(value),
+        ColumnType.Decimal => value is double ? value : Convert.ToDouble(value),
+        ColumnType.DateTime => value is DateTime ? value : Convert.ToDateTime(value),
+        ColumnType.String => value.ToString(),
+        _ => throw new Exception($"Unsupported ColumnType {targetType}")
+    })!;
 }
