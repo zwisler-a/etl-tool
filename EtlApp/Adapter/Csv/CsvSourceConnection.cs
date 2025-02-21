@@ -2,6 +2,7 @@
 using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
+using EtlApp.Domain.Config;
 using EtlApp.Domain.Dto;
 using EtlApp.Domain.Execution;
 using EtlApp.Domain.Source;
@@ -39,10 +40,11 @@ public class CsvSourceConnection(CsvSourceConfig config) : ISourceConnection
         return reportDataList;
     }
 
-    private static ColumnType GetColumnType(DataColumn column, PipelineExecutionContext context)
+    private static PropertyMappingConfig GetColumnType(DataColumn column, PipelineExecutionContext context)
     {
         var source =
             context.MappingConfig.Mappings.Find(mappingConfig => mappingConfig.SourceName.Equals(column.ColumnName));
-        return source?.SourceType ?? ColumnType.String;
+        return source ?? new PropertyMappingConfig
+            { SourceName = column.ColumnName, SourceType = ColumnType.String, TargetName = column.ColumnName };
     }
 }

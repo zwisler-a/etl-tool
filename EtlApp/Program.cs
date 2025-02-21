@@ -1,11 +1,15 @@
 ﻿using EtlApp.Adapter.Csv;
 using EtlApp.Adapter.Sql;
 using EtlApp.Domain.Config;
-using EtlApp.Domain.Dto;
 using EtlApp.Domain.Execution;
+using EtlApp.Domain.Middleware;
 using EtlApp.Domain.Module;
 using EtlApp.Domain.Source;
 
+MiddlewareManager middlewareManager = new MiddlewareManager();
+middlewareManager.Register("type_inference", new DetectTypeMiddleware());
+middlewareManager.Register("type_cast", new CastTypeMiddleware());
+middlewareManager.Register("type_validation", new ValidateTypeMiddleware());
 
 ModuleRegistry moduleRegistry = new ModuleRegistry();
 ExecutionService executionService = new ExecutionService(moduleRegistry);
@@ -28,14 +32,13 @@ var pipeline = executionService.Build(
     },
     new MappingConfig
     {
-        Mappings =
-        [
-            new PropertyMappingConfig { SourceName = "col1", TargetName = "Column1", SourceType = ColumnType.Int },
-            new PropertyMappingConfig { SourceName = "col2", TargetName = "Column2", SourceType = ColumnType.Int },
-            new PropertyMappingConfig { SourceName = "col3", TargetName = "Column3", SourceType = ColumnType.Int },
-            new PropertyMappingConfig { SourceName = "col4", TargetName = "Column4", SourceType = ColumnType.String }
-        ]
-    }
+        Mappings = []
+    },
+    [
+        middlewareManager.Get("type_inference")!, 
+        middlewareManager.Get("type_cast")!,
+        middlewareManager.Get("type_validation")!
+    ]
 );
 
 pipeline.Run();
