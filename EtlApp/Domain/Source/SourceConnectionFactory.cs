@@ -1,25 +1,32 @@
 ﻿using EtlApp.Domain.Config;
+using Microsoft.Extensions.Logging;
 
 namespace EtlApp.Domain.Source
 {
-    public static class SourceConnectionFactory
+    public class SourceConnectionFactory
     {
-        private static readonly Dictionary<Type, Func<SourceConfig, ISourceConnection>> ConnectionCreators = new();
+        private readonly Dictionary<Type, Func<SourceConfig, ISourceConnection>> _connectionCreators = new();
 
-        public static ISourceConnection Create(SourceConfig config)
+        private readonly ILogger _logger = LoggerFactory.Create(builder => builder.AddConsole())
+            .CreateLogger<SourceConnectionFactory>();
+
+
+        public ISourceConnection Create(SourceConfig config)
         {
             var configType = config.GetType();
-            if (ConnectionCreators.TryGetValue(configType, out var creator))
+            if (_connectionCreators.TryGetValue(configType, out var creator))
             {
+                _logger.LogDebug("Creating source of type {}", configType.Name);
                 return creator(config);
             }
 
             throw new ArgumentException($"Invalid source type: {configType.Name}", nameof(config));
         }
 
-        public static void Register<T>(Func<T, ISourceConnection> creator) where T : SourceConfig
+        public void Register<T>(Func<T, ISourceConnection> creator) where T : SourceConfig
         {
-            ConnectionCreators[typeof(T)] = config => creator((T)config);
+            _logger.LogDebug("Registering {}", typeof(T).Name);
+            _connectionCreators[typeof(T)] = config => creator((T)config);
         }
     }
 }

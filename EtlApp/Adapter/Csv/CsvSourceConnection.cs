@@ -3,13 +3,14 @@ using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
 using EtlApp.Domain.Dto;
+using EtlApp.Domain.Execution;
 using EtlApp.Domain.Source;
 
 namespace EtlApp.Adapter.Csv;
 
 public class CsvSourceConnection(CsvSourceConfig config) : ISourceConnection
 {
-    public List<ReportData> Fetch()
+    public List<ReportData> Fetch(PipelineExecutionContext context)
     {
         var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
         {
@@ -28,11 +29,20 @@ public class CsvSourceConnection(CsvSourceConfig config) : ISourceConnection
 
             var dt = new DataTable();
             dt.Load(dataReader);
-            var columnNames = dt.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToList();
-            var report = new ReportData(dt, columnNames);
+            var columnTypes = dt.Columns.Cast<DataColumn>()
+                .ToDictionary(c => c.ColumnName, c => GetColumnType(c, context));
+
+            var report = new ReportData(dt, columnTypes);
             reportDataList.Add(report);
         }
 
         return reportDataList;
+    }
+
+    private static ColumnType GetColumnType(DataColumn column, PipelineExecutionContext context)
+    {
+        var source =
+            context.MappingConfig.Mappings.Find(mappingConfig => mappingConfig.SourceName.Equals(column.ColumnName));
+        return source?.SourceType ?? ColumnType.String;
     }
 }

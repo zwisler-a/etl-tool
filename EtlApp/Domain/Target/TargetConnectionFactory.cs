@@ -2,14 +2,14 @@
 
 namespace EtlApp.Domain.Target
 {
-    public static class TargetConnectionFactory
+    public class TargetConnectionFactory
     {
-        private static readonly Dictionary<Type, Func<TargetConfig, ITargetConnection>> ConnectionCreators = new();
+        private readonly Dictionary<Type, Func<TargetConfig, ITargetConnection>> _connectionCreators = new();
 
-        public static ITargetConnection Create(TargetConfig config)
+        public ITargetConnection Create(TargetConfig config)
         {
             var configType = config.GetType();
-            if (ConnectionCreators.TryGetValue(configType, out var creator))
+            if (_connectionCreators.TryGetValue(configType, out var creator))
             {
                 return creator(config);
             }
@@ -17,9 +17,9 @@ namespace EtlApp.Domain.Target
             throw new ArgumentException($"Invalid Target type: {configType.Name}", nameof(config));
         }
 
-        public static void Register<T>(Func<T, ITargetConnection> creator) where T : TargetConfig
+        public void Register<T>(Func<T, ITargetConnection> creator) where T : TargetConfig
         {
-            ConnectionCreators[typeof(T)] = config => creator((T)config);
+            _connectionCreators[typeof(T)] = config => creator((T)config);
         }
     }
 }

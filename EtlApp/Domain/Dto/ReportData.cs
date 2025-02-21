@@ -4,7 +4,5 @@ namespace EtlApp.Domain.Dto;
 
 public record ReportData(
     DataTable Data,
-    List<string>? ColumnNames
-)
-{
-};
+    Dictionary<string, ColumnType> Columns
+);

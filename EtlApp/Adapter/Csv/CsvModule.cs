@@ -1,22 +1,26 @@
 ﻿using System.Data.Common;
 using EtlApp.Domain.Config;
+using EtlApp.Domain.Database;
 using EtlApp.Domain.Module;
 using EtlApp.Domain.Source;
 using EtlApp.Domain.Target;
 
 namespace EtlApp.Adapter.Csv;
 
-public class CsvModule: Module
+public class CsvModule : Module
 {
-    
-    public override Func<SourceConfig, ISourceConnection>? SourceConnection { get; }
-    public override Func<TargetConfig, ITargetConnection>? TargetConnection { get; }
-    public override Dictionary<string, DbConnection> Connections { get; }
-    
-    public CsvModule()
+    public void RegisterSourceConnection(SourceConnectionFactory factory)
     {
-        SourceConnection = (CsvSourceConfig config) => new CsvSourceConnection(config);
+        factory.Register((CsvSourceConfig config) => new CsvSourceConnection(config));
     }
 
+    public void RegisterTargetConnection(TargetConnectionFactory factory)
+    {
+        // No Target
+    }
 
+    public void RegisterConnections(DatabaseManager databaseManager)
+    {
+        // No Db
+    }
 }

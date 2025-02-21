@@ -1,13 +1,12 @@
-﻿using System.Data.Common;
-using EtlApp.Domain.Config;
+﻿using EtlApp.Domain.Database;
 using EtlApp.Domain.Source;
 using EtlApp.Domain.Target;
 
 namespace EtlApp.Domain.Module;
 
-public abstract class Module
+public interface Module
 {
-    public abstract Func<SourceConfig, ISourceConnection>? SourceConnection { get; }
-    public abstract Func<TargetConfig, ITargetConnection>? TargetConnection { get; }
-    public abstract Dictionary<string, DbConnection> Connections { get; }
+    public void RegisterSourceConnection(SourceConnectionFactory factory);
+    public void RegisterTargetConnection(TargetConnectionFactory factory);
+    public void RegisterConnections(DatabaseManager databaseManager);
 }

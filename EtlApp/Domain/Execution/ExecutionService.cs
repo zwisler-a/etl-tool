@@ -1,9 +1,20 @@
-﻿namespace EtlApp.Domain.Execution;
+﻿using EtlApp.Domain.Config;
+using EtlApp.Domain.Module;
 
-public class ExecutionService
+namespace EtlApp.Domain.Execution;
+
+public class ExecutionService(ModuleRegistry moduleRegistry)
 {
-    public void Execute()
+    public void Execute(Pipeline pipeline)
     {
-        
+        pipeline.Run();
+    }
+
+    public Pipeline Build(SourceConfig sourceConfig, TargetConfig targetConfig, MappingConfig mappingConfig)
+    {
+        var source = moduleRegistry.SourceFactory.Create(sourceConfig);
+        var target = moduleRegistry.TargetFactory.Create(targetConfig);
+        var context = new PipelineExecutionContext(moduleRegistry.DatabaseManager, null, mappingConfig);
+        return new Pipeline(source, target, context);
     }
 }

@@ -5,19 +5,24 @@ namespace EtlApp.Domain.Database
 {
     public class DatabaseManager
     {
-        private static readonly ConcurrentDictionary<string, DbConnection> ConnectionCache = new();
+        private readonly ConcurrentDictionary<string, DbConnection> _connectionCache = new();
 
-        public static void RegisterConnection(string key, DbConnection connection)
+        public void RegisterConnection(string key, DbConnection connection)
         {
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentException("Key cannot be null or empty.", nameof(key));
 
-            ConnectionCache[key] = connection ?? throw new ArgumentNullException(nameof(connection));
+            _connectionCache[key] = connection ?? throw new ArgumentNullException(nameof(connection));
         }
 
-        public static DbConnection? GetConnection(string key)
+        public DbConnection? GetConnection(string key)
         {
-            return ConnectionCache.GetValueOrDefault(key);
+            if (_connectionCache.ContainsKey(key))
+            {
+                return _connectionCache.GetValueOrDefault(key);
+            }
+
+            throw new KeyNotFoundException(key);
         }
     }
 }
