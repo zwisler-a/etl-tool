@@ -40,11 +40,11 @@ public class CsvSourceConnection(CsvSourceConfig config) : ISourceConnection
         return reportDataList;
     }
 
-    private static PropertyMappingConfig GetColumnType(DataColumn column, PipelineExecutionContext context)
+    private static ColumnMappingConfig GetColumnType(DataColumn column, PipelineExecutionContext context)
     {
         var source =
             context.MappingConfig.Mappings.Find(mappingConfig => mappingConfig.SourceName.Equals(column.ColumnName));
-        return source ?? new PropertyMappingConfig
-            { SourceName = column.ColumnName, SourceType = ColumnType.String, TargetName = column.ColumnName };
+        return source ?? new ColumnMappingConfig
+            { SourceName = column.ColumnName, SourceType = ColumnType.Undefined, TargetName = column.ColumnName };
     }
 }

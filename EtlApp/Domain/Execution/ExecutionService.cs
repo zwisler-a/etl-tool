@@ -11,12 +11,12 @@ public class ExecutionService(ModuleRegistry moduleRegistry)
         pipeline.Run();
     }
 
-    public Pipeline Build(SourceConfig sourceConfig, TargetConfig targetConfig, MappingConfig mappingConfig,
+    public Pipeline Build(List<SourceConfig> sourceConfig, List<TargetConfig> targetConfig, MappingConfig mappingConfig,
         List<IMiddleware> middlewares)
     {
-        var source = moduleRegistry.SourceFactory.Create(sourceConfig);
-        var target = moduleRegistry.TargetFactory.Create(targetConfig);
+        var sources = sourceConfig.Select(s => moduleRegistry.SourceFactory.Create(s)).ToList();
+        var targets = targetConfig.Select(s => moduleRegistry.TargetFactory.Create(s)).ToList();
         var context = new PipelineExecutionContext(moduleRegistry.DatabaseManager, null, mappingConfig);
-        return new Pipeline(source, target, context, middlewares);
+        return new Pipeline(context, middlewares, sources, targets);
     }
 }

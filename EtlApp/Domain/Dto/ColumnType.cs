@@ -2,6 +2,7 @@
 
 public enum ColumnType
 {
+    Undefined,
     String,
     Decimal,
     Int,

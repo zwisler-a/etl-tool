@@ -1,0 +1,22 @@
+﻿{
+  "source": [
+    {
+      "Type": "csv",
+      "FilePath": "C:\\Users\\Alex\\RiderProjects\\EtlApp\\EtlApp\\TestFiles",
+      "FilePrefix": "te",
+      "Delimiter": ","
+    }
+  ],
+  "target": [
+    {
+      "Type": "sql",
+      "ConnectionName": "sql",
+      "TableName": "test"
+    }
+  ],
+  "middleware": [
+    "type_inference",
+    "type_cast",
+    "type_validation"
+  ]
+}

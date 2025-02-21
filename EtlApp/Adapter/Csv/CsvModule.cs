@@ -11,12 +11,14 @@ public class CsvModule : Module
 {
     public void RegisterSourceConnection(SourceConnectionFactory factory)
     {
+        SourceConfigConverter.Register<CsvSourceConfig>("csv");
         factory.Register((CsvSourceConfig config) => new CsvSourceConnection(config));
     }
 
     public void RegisterTargetConnection(TargetConnectionFactory factory)
     {
-        // No Target
+        TargetConfigConverter.Register<CsvTargetConfig>("csv");
+        factory.Register((CsvTargetConfig config) => new CsvTargetConnection(config));
     }
 
     public void RegisterConnections(DatabaseManager databaseManager)

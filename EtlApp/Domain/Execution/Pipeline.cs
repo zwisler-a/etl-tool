@@ -1,4 +1,5 @@
-﻿using EtlApp.Domain.Dto;
+﻿using EtlApp.Domain.Config;
+using EtlApp.Domain.Dto;
 using EtlApp.Domain.Middleware;
 using EtlApp.Domain.Source;
 using EtlApp.Domain.Target;
@@ -8,54 +9,71 @@ namespace EtlApp.Domain.Execution;
 
 public class Pipeline
 {
-    private readonly ISourceConnection _source;
-    private readonly ITargetConnection _target;
-    private List<IMiddleware> _middlewares;
+    private readonly List<ISourceConnection> _sources;
+    private readonly List<ITargetConnection> _targets;
+    private readonly List<IMiddleware> _middlewares;
     private readonly PipelineExecutionContext _context;
 
-    private readonly ILogger _logger = LoggerFactory.Create(builder => builder.AddConsole())
-        .CreateLogger<Pipeline>();
+    private readonly ILogger _logger;
 
-    public Pipeline(ISourceConnection source, ITargetConnection target, PipelineExecutionContext context,
-        List<IMiddleware> middlewares)
+    public Pipeline(PipelineExecutionContext context,
+        List<IMiddleware> middlewares, List<ISourceConnection> sources, List<ITargetConnection> targets)
     {
-        _source = source;
-        _target = target;
         _context = context;
         _middlewares = middlewares;
+        _sources = sources;
+        _targets = targets;
+        _logger = Logging.LoggerFactory.CreateLogger(ToString());;
     }
 
     public List<ExecutionIssue> Run()
     {
         var executionIssues = new List<ExecutionIssue>();
-        _logger.LogInformation("Starting execution ...");
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        _logger.LogDebug("Execution started.");
+
         try
         {
-            _logger.LogInformation("Fetching data ...");
-            var reportData = _source.Fetch(_context);
-            _logger.LogInformation("Found {} report(s)", reportData.Count);
+            _logger.LogDebug("Fetching data ...");
+            var reportData = _sources.SelectMany(source => source.Fetch(_context)).ToList();
+            _logger.LogDebug("Found {Count} report(s)", reportData.Count);
+
             foreach (var report in reportData)
             {
-                var processed = report;
-                foreach (var mw in _middlewares)
+                var processedReport = report;
+                foreach (var middleware in _middlewares)
                 {
-                    _logger.LogInformation("Applied middleware ...");
-                    processed = mw.Process(processed, _context);
+                    _logger.LogDebug("Applying middleware {MiddlewareName}...", middleware.GetType().Name);
+                    processedReport = middleware.Process(processedReport, _context);
                 }
 
-                _logger.LogInformation("Uploading report ...");
-                _target.Upload(report, _context);
-                _logger.LogInformation("Done");
+                _logger.LogDebug("Uploading report ...");
+                foreach (var target in _targets)
+                {
+                    _logger.LogDebug("Uploading to target {TargetName}...", target.GetType().Name);
+                    target.Upload(processedReport, _context);
+                }
+
+                _logger.LogDebug("Report processing completed.");
             }
         }
         catch (Exception ex)
         {
             executionIssues.Add(new ExecutionIssue(ex.Message));
-            _logger.LogError("An error occured: {}", ex);
-            return executionIssues;
+            _logger.LogError("An error occurred: {Error}", ex);
+        }
+        finally
+        {
+            stopwatch.Stop();
+            _logger.LogInformation("Execution finished in {ElapsedMilliseconds} ms", stopwatch.ElapsedMilliseconds);
         }
 
-
         return executionIssues;
+    }
+
+    public sealed override string ToString()
+    {
+        return
+            $"[{string.Join(",", _sources.Select(s => s.GetType().Name))}]->[{string.Join(",", _targets.Select(s => s.GetType().Name))}]";
     }
 }

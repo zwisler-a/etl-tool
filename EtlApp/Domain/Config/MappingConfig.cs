@@ -2,5 +2,5 @@
 
 public class MappingConfig
 {
-    public required List<PropertyMappingConfig> Mappings { get; set; }
+    public required List<ColumnMappingConfig> Mappings { get; set; }
 }

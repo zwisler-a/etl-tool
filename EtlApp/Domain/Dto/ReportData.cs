@@ -5,5 +5,5 @@ namespace EtlApp.Domain.Dto;
 
 public record ReportData(
     DataTable Data,
-    Dictionary<string, PropertyMappingConfig> Columns
+    Dictionary<string, ColumnMappingConfig> Columns
 );

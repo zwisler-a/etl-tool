@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace EtlApp.Domain.Middleware;
 
-public class DetectTypeMiddleware : IMiddleware
+public class DetectTypeMiddleware(bool onlyUnknown) : IMiddleware
 {
     private readonly ILogger _logger = LoggerFactory.Create(builder => builder.AddConsole())
         .CreateLogger<DetectTypeMiddleware>();
@@ -14,12 +14,17 @@ public class DetectTypeMiddleware : IMiddleware
     {
         foreach (var (columnName, columnConfig) in reportData.Columns)
         {
+            if (onlyUnknown && columnConfig.SourceType != ColumnType.Undefined)
+            {
+                continue;
+            }
+
             var columnValues = reportData.Data.AsEnumerable()
                 .Select(row => row[columnName])
                 .ToList();
 
             var detectedType = DetectColumnType(columnValues);
-            _logger.LogInformation($"Detected type: {columnName}: {detectedType}");
+            _logger.LogDebug($"Detected type: {columnName}: {detectedType}");
             columnConfig.SourceType = detectedType;
         }
 
