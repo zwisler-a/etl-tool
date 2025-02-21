@@ -2,23 +2,22 @@
 using System.Text.Json.Serialization;
 
 namespace EtlApp.Domain.Config;
-
-public class SourceConfigConverter : JsonConverter<SourceConfig>
+public class DatabaseConfigConverter : JsonConverter<DatabaseConfig>
 {
     // Static dictionary to hold type registrations
-    private static readonly Dictionary<string, Func<JsonElement, SourceConfig>> TypeRegistry = new();
+    private static readonly Dictionary<string, Func<JsonElement, DatabaseConfig>> TypeRegistry = new();
 
-    static SourceConfigConverter()
+    static DatabaseConfigConverter()
     {
     }
 
     // Method to register child types
-    public static void Register<T>(string type) where T : SourceConfig
+    public static void Register<T>(string type) where T : DatabaseConfig
     {
         TypeRegistry[type] = (json) => JsonSerializer.Deserialize<T>(json.GetRawText());
     }
 
-    public override SourceConfig Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override DatabaseConfig Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         using var doc = JsonDocument.ParseValue(ref reader);
         var root = doc.RootElement;
@@ -39,7 +38,7 @@ public class SourceConfigConverter : JsonConverter<SourceConfig>
         throw new JsonException($"Unknown Type '{type}'");
     }
 
-    public override void Write(Utf8JsonWriter writer, SourceConfig value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, DatabaseConfig value, JsonSerializerOptions options)
     {
         JsonSerializer.Serialize(writer, (object)value, value.GetType(), options);
     }

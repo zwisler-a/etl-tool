@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace EtlApp.Config;
+namespace EtlApp.Domain.Config;
 
 [JsonConverter(typeof(SourceConfigConverter))]
 public class TargetConfig

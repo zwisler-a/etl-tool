@@ -3,7 +3,6 @@
 namespace EtlApp.Domain.Config;
 
 [JsonConverter(typeof(SourceConfigConverter))]
-public class SourceConfig
+public class DatabaseConfig
 {
-    public required string Type { get; set; }
 }

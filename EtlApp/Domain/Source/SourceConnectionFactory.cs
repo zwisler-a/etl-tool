@@ -1,4 +1,4 @@
-﻿using EtlApp.Config;
+﻿using EtlApp.Domain.Config;
 
 namespace EtlApp.Domain.Source
 {

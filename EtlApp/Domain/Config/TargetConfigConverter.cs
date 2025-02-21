@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using EtlApp.Config;
+
+namespace EtlApp.Domain.Config;
 
 public class TargetConfigConverter : JsonConverter<TargetConfig>
 {
