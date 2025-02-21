@@ -1,0 +1,21 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtlApp", "EtlApp\EtlApp.csproj", "{E4E890FC-E4EB-46DA-8A5B-68A73B6E69B0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D6AC97F4-0A51-4057-9B09-08707B535F0E}"
+	ProjectSection(SolutionItems) = preProject
+		compose.yaml = compose.yaml
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E4E890FC-E4EB-46DA-8A5B-68A73B6E69B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4E890FC-E4EB-46DA-8A5B-68A73B6E69B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4E890FC-E4EB-46DA-8A5B-68A73B6E69B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4E890FC-E4EB-46DA-8A5B-68A73B6E69B0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

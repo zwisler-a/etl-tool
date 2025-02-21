@@ -1,0 +1,6 @@
+﻿services:
+  etlapp:
+    image: etlapp
+    build:
+      context: .
+      dockerfile: EtlApp/Dockerfile
