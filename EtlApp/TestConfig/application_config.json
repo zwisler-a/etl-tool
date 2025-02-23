@@ -5,5 +5,7 @@
       "ConnectionString": "Server=localhost;Database=TestDb;User Id=sa;Password=ilujhasdhas73679zhansdjASDalsdjhasjdn;Encrypt=False;"
     }
   ],
-  "ConfigFolder": "C:\\Users\\Alex\\RiderProjects\\EtlApp\\EtlApp\\TestConfig"
+  "ConfigFolder": "C:\\Users\\Alex\\RiderProjects\\EtlApp\\EtlApp\\TestConfig",
+  "LogLevel": "Information"
+  
 }

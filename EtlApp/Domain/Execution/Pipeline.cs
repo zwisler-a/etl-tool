@@ -1,8 +1,8 @@
-﻿using EtlApp.Domain.Config;
-using EtlApp.Domain.Dto;
-using EtlApp.Domain.Middleware;
-using EtlApp.Domain.Source;
+﻿using System.Diagnostics;
+using EtlApp.Domain.Config;
+using EtlApp.Domain.Connection;
 using EtlApp.Domain.Target;
+using EtlApp.Util.Observable;
 using Microsoft.Extensions.Logging;
 
 namespace EtlApp.Domain.Execution;
@@ -12,63 +12,54 @@ public class Pipeline
     private readonly List<ISourceConnection> _sources;
     private readonly List<ITargetConnection> _targets;
     private readonly List<IMiddleware> _middlewares;
-    private readonly PipelineExecutionContext _context;
 
     private readonly ILogger _logger;
 
-    public Pipeline(PipelineExecutionContext context,
+    public Pipeline(
         List<IMiddleware> middlewares, List<ISourceConnection> sources, List<ITargetConnection> targets)
     {
-        _context = context;
         _middlewares = middlewares;
         _sources = sources;
         _targets = targets;
-        _logger = Logging.LoggerFactory.CreateLogger(ToString());;
+        _logger = Logging.LoggerFactory.CreateLogger(ToString());
     }
 
-    public List<ExecutionIssue> Run()
+    public void Run()
     {
-        var executionIssues = new List<ExecutionIssue>();
-        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-        _logger.LogDebug("Execution started.");
-
+        var stopwatch = Stopwatch.StartNew();
+        _logger.LogInformation("Start execution");
+        var counter = new RowCounterObserver(_logger);
         try
         {
-            _logger.LogDebug("Fetching data ...");
-            var reportData = _sources.SelectMany(source => source.Fetch(_context)).ToList();
-            _logger.LogDebug("Found {Count} report(s)", reportData.Count);
-
-            foreach (var report in reportData)
+            foreach (var sourceConnection in _sources)
             {
-                var processedReport = report;
-                foreach (var middleware in _middlewares)
+                var pipes = ObservableUtils.Concat([.._middlewares]);
+                sourceConnection.Subscribe(pipes.Observer);
+
+
+                foreach (var targetConnection in _targets)
                 {
-                    _logger.LogDebug("Applying middleware {MiddlewareName}...", middleware.GetType().Name);
-                    processedReport = middleware.Process(processedReport, _context);
+                    pipes.Observable.Subscribe(targetConnection);
                 }
 
-                _logger.LogDebug("Uploading report ...");
-                foreach (var target in _targets)
-                {
-                    _logger.LogDebug("Uploading to target {TargetName}...", target.GetType().Name);
-                    target.Upload(processedReport, _context);
-                }
+                _logger.LogDebug("Fetching data ...");
+                pipes.Observable.Subscribe(counter);
 
-                _logger.LogDebug("Report processing completed.");
+                sourceConnection.Fetch();
             }
         }
         catch (Exception ex)
         {
-            executionIssues.Add(new ExecutionIssue(ex.Message));
-            _logger.LogError("An error occurred: {Error}", ex);
+            _logger.LogError(ex, "An error occurred.");
         }
         finally
         {
             stopwatch.Stop();
-            _logger.LogInformation("Execution finished in {ElapsedMilliseconds} ms", stopwatch.ElapsedMilliseconds);
+            _logger.LogInformation("Execution finished: {} chunks with {} rows to {} target(s) in {} ms",
+                counter.ReportCount,
+                counter.RowCount, _targets.Count,
+                stopwatch.ElapsedMilliseconds);
         }
-
-        return executionIssues;
     }
 
     public sealed override string ToString()

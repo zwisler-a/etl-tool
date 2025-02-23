@@ -1,6 +1,9 @@
 ﻿using System.Collections;
 using EtlApp.Domain.Config;
+using EtlApp.Domain.Connection;
 using EtlApp.Domain.Database;
+using EtlApp.Domain.Dto;
+using EtlApp.Domain.Execution;
 using EtlApp.Domain.Module;
 using EtlApp.Domain.Source;
 using EtlApp.Domain.Target;
@@ -10,19 +13,20 @@ namespace EtlApp.Adapter.Sql;
 
 public class SqlModule : Module
 {
-    public void RegisterSourceConnection(SourceConnectionFactory factory)
+    public override void RegisterSourceConnection(SourceConnectionFactory factory)
     {
         SourceConfigConverter.Register<SqlSourceConfig>("sql");
-        factory.Register((SqlSourceConfig config) => new SqlSourceConnection(config));
+        factory.Register((SqlSourceConfig config, PipelineContext context) => new SqlSourceConnection(config, context));
     }
 
-    public void RegisterTargetConnection(TargetConnectionFactory factory)
+    public override void RegisterTargetConnection(TargetConnectionFactory factory)
     {
         TargetConfigConverter.Register<SqlTargetConfig>("sql");
-        factory.Register((SqlTargetConfig config) => new SqlTargetConnection(config));
+        factory.Register((SqlTargetConfig config, PipelineContext context) =>
+            new SqlTargetConnection(config, context));
     }
 
-    public void RegisterConnections(DatabaseManager databaseManager)
+    public override void RegisterConnections(DatabaseManager databaseManager)
     {
         DatabaseConfigConverter.Register<SqlDatabaseConfig>("sql");
 
@@ -34,7 +38,6 @@ public class SqlModule : Module
         {
             var connection = new SqlConnection();
             connection.ConnectionString = databaseConfig.ConnectionString;
-            connection.Open();
             databaseManager.RegisterConnection(databaseConfig.Type, connection);
         }
     }

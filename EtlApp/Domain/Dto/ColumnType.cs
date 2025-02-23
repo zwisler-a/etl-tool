@@ -8,4 +8,5 @@ public enum ColumnType
     Int,
     DateTime,
     Date,
+    Boolean,
 }

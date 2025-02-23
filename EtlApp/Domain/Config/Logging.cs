@@ -12,6 +12,6 @@ public class Logging
             options.SingleLine = true;
             options.TimestampFormat = "HH:mm:ss ";
         });
-        builder.SetMinimumLevel(LogLevel.Debug);
+        builder.SetMinimumLevel(LogLevel.Information);
     });
 }

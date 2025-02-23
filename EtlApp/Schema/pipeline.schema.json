@@ -1,0 +1,110 @@
+﻿{
+  "type": "object",
+  "properties": {
+    "source": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "Type": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "Type"
+        ]
+      }
+    },
+    "target": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "Type": {
+            "type": "string"
+          },
+          "UpdateStrategy": {
+            "type": "string",
+            "enum": ["ReplaceComplete", "ArchiveInTable", "MergeByUnique", "Append"]
+          }
+        },
+        "required": [
+          "Type", 
+          "UpdateStrategy"
+        ]
+      }
+    },
+    "mapping": {
+      "type": "object",
+      "properties": {
+        "Mappings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "SourceName": {
+                "type": "string"
+              },
+              "Modifiers": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "Unique"
+                  ]
+                }
+              },
+              "Transform": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "TargetName": {
+                "type": "string"
+              },
+              "SourceType": {
+                "type": "string",
+                "enum": [
+                  "Undefined",
+                  "String",
+                  "Decimal",
+                  "Int",
+                  "DateTime",
+                  "Date"
+                ]
+              }
+            },
+            "required": [
+              "SourceName"
+            ]
+          }
+        }
+      }
+    },
+    "transformer": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "Type": {
+            "type": "string"
+          },
+          "Name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "Type",
+          "Name"
+        ]
+      }
+    }
+  },
+  "required": [
+    "source",
+    "target"
+  ]
+}

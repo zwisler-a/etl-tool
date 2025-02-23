@@ -7,39 +7,71 @@ using EtlApp.Domain.Dto;
 using EtlApp.Domain.Execution;
 using EtlApp.Domain.Source;
 using EtlApp.Domain.Target;
+using Microsoft.Extensions.Logging;
 
 namespace EtlApp.Adapter.Csv;
 
-public class CsvTargetConnection(CsvTargetConfig config) : ITargetConnection
+public class CsvTargetConnection : ITargetConnection
 {
-    public void Upload(ReportData report, PipelineExecutionContext context)
+    private readonly CsvTargetConfig _config;
+    private readonly StreamWriter _writer;
+    private readonly CsvWriter _csv;
+    private bool _firstCall = true;
+
+    public List<UpdateStrategy> GetSupportedUpdateStrategies()
     {
+        return [UpdateStrategy.ReplaceComplete];
+    }
+
+    public CsvTargetConnection(CsvTargetConfig config)
+    {
+        _config = config;
         var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
         {
             HasHeaderRecord = true,
             Delimiter = config.Delimiter,
         };
-    
+
         var fileName = Path.Combine(config.FilePath, $"{config.FilePrefix}_{DateTime.UtcNow:yyyyMMddHHmmssfff}.csv");
+
+        _writer = new StreamWriter(fileName);
+        _csv = new CsvWriter(_writer, csvConfig);
+        _csv.Context.TypeConverterCache.AddConverter<DateTime>(new CustomDateTimeConverter("yyyy-MM-dd HH:mm:ss"));
+        _csv.Context.TypeConverterCache.AddConverter<DateOnly>(new CustomDateOnlyConverter("yyyy-MM-dd"));
+    }
     
-        using var writer = new StreamWriter(fileName);
-        using var csv = new CsvWriter(writer, csvConfig);
     
-        // Write header
-        foreach (DataColumn column in report.Data.Columns)
+    public void OnNext(ReportData report)
+    {
+        if (_firstCall)
         {
-            csv.WriteField(column.ColumnName);
+            foreach (DataColumn column in report.Data.Columns)
+            {
+                _csv.WriteField(column.ColumnName);
+            }
+            _csv.NextRecord();
+            _firstCall = false;
         }
-        csv.NextRecord();
-    
+
         // Write data
         foreach (DataRow row in report.Data.Rows)
         {
             foreach (DataColumn column in report.Data.Columns)
             {
-                csv.WriteField(row[column]);
+                _csv.WriteField(row[column]);
             }
-            csv.NextRecord();
+
+            _csv.NextRecord();
         }
+        _csv.Flush();
     }
+
+    public void OnCompleted()
+    {
+    }
+
+    public void OnError(Exception error)
+    {
+    }
+    
 }

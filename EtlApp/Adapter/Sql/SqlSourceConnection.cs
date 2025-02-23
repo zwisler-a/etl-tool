@@ -1,23 +1,24 @@
 ﻿using System.Data;
 using EtlApp.Domain.Config;
+using EtlApp.Domain.Connection;
 using EtlApp.Domain.Dto;
-using EtlApp.Domain.Execution;
 using EtlApp.Domain.Source;
-using EtlApp.Domain.Target;
+using EtlApp.Util.Observable;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 
 namespace EtlApp.Adapter.Sql;
 
-public class SqlSourceConnection(SqlSourceConfig config) : ISourceConnection
+public class SqlSourceConnection(SqlSourceConfig config, PipelineContext context)
+    : Observable<ReportData>, ISourceConnection
 {
-    private readonly ILogger _logger = LoggerFactory.Create(builder => builder.AddConsole())
-        .CreateLogger<SqlTargetConnection>();
+    private readonly ILogger _logger = Logging.LoggerFactory.CreateLogger<SqlSourceConnection>();
 
-    public List<ReportData> Fetch(PipelineExecutionContext context)
+    public void Fetch()
     {
         var dbConnection = context.DatabaseManager.GetConnection(config.ConnectionName) ??
                            throw new Exception("Unknown connection");
+        dbConnection.Open();
 
         var commandText = CreateSelectStatement();
         _logger.LogDebug("SQL Select statement: \"{}\"", commandText);
@@ -32,9 +33,9 @@ public class SqlSourceConnection(SqlSourceConfig config) : ISourceConnection
             var columnName = reader.GetName(i);
             reportData.Columns[columnName] = new ColumnMappingConfig
             {
-                TargetName = columnName, 
+                TargetName = columnName,
                 SourceName = columnName,
-                SourceType = SqlTypes.TypeDataTypes.GetValueOrDefault(reader.GetFieldType(i)!)
+                SourceType = SqlTypes.DataTypeToSqlType.GetValueOrDefault(reader.GetFieldType(i)!)
             };
             reportData.Data.Columns.Add(columnName);
         }
@@ -48,9 +49,20 @@ public class SqlSourceConnection(SqlSourceConfig config) : ISourceConnection
             }
 
             reportData.Data.Rows.Add(row);
+            if (config.BatchSize > 0 && config.BatchSize == reportData.Data.Rows.Count)
+            {
+                Next(reportData);
+                reportData = new ReportData(reportData.Data.Clone(), new(reportData.Columns));
+            }
         }
 
-        return [reportData];
+        if (reportData.Data.Rows.Count != 0)
+        {
+            Next(reportData);
+        }
+
+        dbConnection.Close();
+        Complete();
     }
 
     private string CreateSelectStatement()

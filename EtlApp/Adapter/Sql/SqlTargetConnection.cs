@@ -1,89 +1,102 @@
-﻿using System.Data;
+﻿using System.Data.Common;
+using EtlApp.Domain.Config;
 using EtlApp.Domain.Dto;
-using EtlApp.Domain.Execution;
 using EtlApp.Domain.Target;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
+using static EtlApp.Adapter.Sql.SqlCommands;
 
 namespace EtlApp.Adapter.Sql;
 
-public class SqlTargetConnection(SqlTargetConfig config) : ITargetConnection
+public class SqlTargetConnection : ITargetConnection
 {
-    private readonly ILogger _logger = LoggerFactory.Create(builder => builder.AddConsole())
-        .CreateLogger<SqlTargetConnection>();
+    private readonly ILogger _logger = Logging.LoggerFactory.CreateLogger<SqlTargetConnection>();
+    private readonly SqlTargetConfig _config;
+    private readonly PipelineContext _context;
+    private readonly DbConnection _dbConnection;
 
-    public void Upload(ReportData report, PipelineExecutionContext context)
+    public SqlTargetConnection(SqlTargetConfig config, PipelineContext context)
     {
-        var dbConnection = context.DatabaseManager.GetConnection(config.ConnectionName) ??
-                           throw new Exception("Unknown connection");
+        _config = config;
+        _context = context;
 
-        using var transaction = (SqlTransaction)dbConnection.BeginTransaction();
-
-        // Check if the table exists, create it if necessary
-        var checkTableCommandText = CreateTableDefinition(report);
-        _logger.LogDebug("Check Table SQL: \"{}\"", checkTableCommandText);
-
-        using (var checkTableCommand = new SqlCommand(checkTableCommandText, (SqlConnection)dbConnection))
-        {
-            checkTableCommand.Transaction = transaction;
-            checkTableCommand.ExecuteNonQuery();
-        }
-
-        if (report.Data.Rows.Count > 0)
-        {
-            var commandText = CreateInsertStatement(report);
-            _logger.LogDebug("SQL Insert statement: \"{}\"", commandText);
-
-            using var command = new SqlCommand(commandText, (SqlConnection)dbConnection);
-            foreach (var columnName in report.Columns.Keys)
-            {
-                command.Parameters.AddWithValue("@" + columnName, DBNull.Value); // Handle proper value assignment
-            }
-
-            foreach (DataRow row in report.Data.Rows)
-            {
-                foreach (var columnName in report.Columns.Keys)
-                {
-                    command.Parameters[$"@{columnName}"].Value = row[columnName] ?? DBNull.Value;
-                }
-
-                command.Transaction = transaction;
-                command.ExecuteNonQuery();
-            }
-        }
-
-        transaction.Commit();
+        var con = _context.DatabaseManager.GetConnection(_config.ConnectionName) ??
+                  throw new Exception("Unknown connection");
+        _dbConnection = new SqlConnection(con.ConnectionString);
     }
 
-    private string CreateTableDefinition(ReportData data)
-    {
-        var typeDefinition = data.Columns.Select((c) =>
-        {
-            var (_, mappingConfig) = c;
-            var sqlType = SqlTypes.DataTypes.GetValueOrDefault(mappingConfig.SourceType) ?? "varchar(255)";
-            return $"{mappingConfig.TargetName} {sqlType}";
-        });
-        var tableDefinitionBody = string.Join(", ", typeDefinition);
 
+    public List<UpdateStrategy> GetSupportedUpdateStrategies()
+    {
         return
-            $"IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '{config.TableName}') " +
-            $"CREATE TABLE {config.TableName} ({tableDefinitionBody})";
+        [
+            UpdateStrategy.ReplaceComplete,
+            UpdateStrategy.ArchiveInTable,
+            UpdateStrategy.MergeByUnique,
+            UpdateStrategy.Append
+        ];
     }
 
-    private string CreateInsertStatement(ReportData data)
+    public void OnCompleted()
     {
-        var columns = data.Columns.Select(c =>
-        {
-            var (_, mappingConfig) = c;
-            return $"{mappingConfig.TargetName}";
-        });
+        _dbConnection.Close();
+    }
 
-        var values = data.Columns.Select(c =>
-        {
-            var (_, mappingConfig) = c;
-            return $"@{mappingConfig.SourceName}";
-        });
+    public void OnError(Exception error)
+    {
+        _dbConnection.Close();
+    }
 
-        return $"INSERT INTO {config.TableName} ({string.Join(", ", columns)}) VALUES ({string.Join(", ", values)})";
+    public void OnNext(ReportData report)
+    {
+        if (report.Data.Rows.Count == 0) return; // Sanity check
+        _dbConnection.Open();
+        switch (_config.UpdateStrategy)
+        {
+            case UpdateStrategy.ReplaceComplete:
+                CreateTableIfNecessary(report, _dbConnection, _config.TableName);
+                ClearTable(_dbConnection, _config.TableName);
+                UploadIntoTable(report, _dbConnection, _config.TableName);
+                break;
+            case UpdateStrategy.ArchiveInTable:
+                var archiveTable = _config.ArchiveTableName ?? $"{_config.TableName}_Archive";
+                CreateTableIfNecessary(report, _dbConnection, _config.TableName);
+                CreateTableIfNecessary(report, _dbConnection, archiveTable);
+                CopyTable(_dbConnection, _config.TableName, archiveTable);
+                ClearTable(_dbConnection, _config.TableName);
+                UploadIntoTable(report, _dbConnection, _config.TableName);
+                break;
+            case UpdateStrategy.Append:
+                CreateTableIfNecessary(report, _dbConnection, _config.TableName);
+                UploadIntoTable(report, _dbConnection, _config.TableName);
+                break;
+            case UpdateStrategy.MergeByUnique:
+                var staging = _config.StagingTableName ?? $"Staging_{_config.TableName}";
+                CreateTableIfNecessary(report, _dbConnection, _config.TableName);
+                CreateTableIfNecessary(report, _dbConnection, staging);
+                ClearTable(_dbConnection, staging);
+                UploadIntoTable(report, _dbConnection, staging);
+                var mergeKeys = GetMergeKeys(report);
+                MergeTables(_dbConnection, staging, _config.TableName, mergeKeys.ToArray());
+                break;
+        }
+
+        _dbConnection.Close();
+    }
+
+    private static List<string> GetMergeKeys(ReportData report)
+    {
+        var mergeKeys = new List<string>();
+        foreach (var (key, value) in report.Columns)
+        {
+            var val = value.Modifiers;
+            if (val == null) continue;
+            if (val.Contains(ColumnModifiers.DuplicateIdentifier) || val.Contains(ColumnModifiers.PrimaryKey))
+            {
+                mergeKeys.Add(key);
+            }
+        }
+
+        return mergeKeys;
     }
 }

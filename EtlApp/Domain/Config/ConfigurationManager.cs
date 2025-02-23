@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace EtlApp.Domain.Config;
 
@@ -18,7 +19,10 @@ public static class ConfigurationManager
             return JsonSerializer.Deserialize<ApplicationConfiguration>(json, new JsonSerializerOptions
             {
                 Converters =
-                    { new SourceConfigConverter(), new TargetConfigConverter(), new DatabaseConfigConverter() },
+                {
+                    new SourceConfigConverter(), new TargetConfigConverter(), new DatabaseConfigConverter(),
+                    new JsonStringEnumConverter()
+                },
                 PropertyNameCaseInsensitive = true
             }) ?? throw new NullReferenceException();
         }
@@ -36,8 +40,12 @@ public static class ConfigurationManager
             var json = File.ReadAllText(file);
             return JsonSerializer.Deserialize<PipelineConfiguration>(json, new JsonSerializerOptions
             {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                 Converters =
-                    { new SourceConfigConverter(), new TargetConfigConverter(), new DatabaseConfigConverter() },
+                {
+                    new SourceConfigConverter(), new TargetConfigConverter(), new DatabaseConfigConverter(),
+                    new JsonStringEnumConverter()
+                },
                 PropertyNameCaseInsensitive = true
             }) ?? throw new NullReferenceException();
         }

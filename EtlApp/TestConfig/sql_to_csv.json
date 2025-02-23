@@ -1,0 +1,20 @@
+﻿{
+  "$schema": "../Schema/pipeline.schema.json",
+  "source": [
+    {
+      "Type": "sql",
+      "ConnectionName": "sql",
+      "TableName": "data",
+      "BatchSize": 10000
+    }
+  ],
+  "target": [
+    {
+      "Type": "csv",
+      "FilePath": "C:\\Users\\Alex\\RiderProjects\\EtlApp\\EtlApp\\TestFiles",
+      "FilePrefix": "generated_data",
+      "Delimiter": ",",
+      "UpdateStrategy": "ReplaceComplete"
+    }
+  ]
+}
