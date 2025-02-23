@@ -97,12 +97,10 @@ public static class SqlCommands
     {
         var dataTable = report.Data; // Assuming report.Data is a DataTable
 
-        using var bulkCopy = new SqlBulkCopy((SqlConnection)dbConnection)
-        {
-            DestinationTableName = tableName,
-            BatchSize = 1000,
-            NotifyAfter = 1000
-        };
+        using var bulkCopy = new SqlBulkCopy((SqlConnection)dbConnection);
+        bulkCopy.DestinationTableName = tableName;
+        bulkCopy.BatchSize = 1000;
+        bulkCopy.NotifyAfter = 1000;
 
         foreach (var columnName in report.Columns.Keys)
         {

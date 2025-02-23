@@ -1,6 +1,5 @@
 ﻿using EtlApp.Domain.Config;
 using EtlApp.Domain.Dto;
-using EtlApp.Domain.Execution;
 using EtlApp.Util.Observable;
 using Microsoft.Extensions.Logging;
 

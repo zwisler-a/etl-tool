@@ -1,4 +1,4 @@
-﻿using EtlApp.Domain.Config;
+﻿using EtlApp.Domain.Config.Pipeline;
 using EtlApp.Domain.Dto;
 using EtlApp.Util;
 

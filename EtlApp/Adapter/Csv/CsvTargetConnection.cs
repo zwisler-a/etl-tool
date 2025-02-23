@@ -2,12 +2,8 @@
 using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
-using EtlApp.Domain.Config;
+using EtlApp.Domain.Connection;
 using EtlApp.Domain.Dto;
-using EtlApp.Domain.Execution;
-using EtlApp.Domain.Source;
-using EtlApp.Domain.Target;
-using Microsoft.Extensions.Logging;
 
 namespace EtlApp.Adapter.Csv;
 

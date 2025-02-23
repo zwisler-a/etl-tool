@@ -1,11 +1,8 @@
-﻿using System.Data.Common;
-using EtlApp.Domain.Config;
+﻿using EtlApp.Domain.Config;
+using EtlApp.Domain.Config.Pipeline.Converter;
 using EtlApp.Domain.Connection;
-using EtlApp.Domain.Database;
 using EtlApp.Domain.Dto;
 using EtlApp.Domain.Module;
-using EtlApp.Domain.Source;
-using EtlApp.Domain.Target;
 
 namespace EtlApp.Adapter.Csv;
 

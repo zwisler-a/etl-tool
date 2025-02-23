@@ -5,14 +5,75 @@
       "type": "array",
       "items": {
         "type": "object",
-        "additionalProperties": true,
-        "properties": {
-          "Type": {
-            "type": "string"
+        "oneOf": [
+          {
+            "properties": {
+              "Type": {
+                "const": "sql"
+              },
+              "ConnectionName": {
+                "type": "string"
+              },
+              "TableName": {
+                "type": "string"
+              },
+              "BatchSize": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "ConnectionName",
+              "TableName"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "properties": {
+              "Type": {
+                "const": "csv"
+              },
+              "FilePath": {
+                "type": "string"
+              },
+              "FilePrefix": {
+                "type": "string"
+              },
+              "Delimiter": {
+                "type": "string"
+              },
+              "BatchSize": {
+                "type": "number"
+              },
+              "MoveToArchive": {
+                "type": "boolean"
+              },
+              "FailedArchivePath": {
+                "type": "string"
+              },
+              "SuccessArchivePath": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "FilePath",
+              "Delimiter",
+              "FilePrefix",
+              "MoveToArchive"
+            ],
+            "if": {
+              "properties": {
+                "MoveToArchive": {
+                  "const": true
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "FailedArchivePath",
+                "SuccessArchivePath"
+              ]
+            }
           }
-        },
-        "required": [
-          "Type"
         ]
       }
     },
@@ -20,18 +81,62 @@
       "type": "array",
       "items": {
         "type": "object",
-        "additionalProperties": true,
         "properties": {
           "Type": {
             "type": "string"
           },
           "UpdateStrategy": {
             "type": "string",
-            "enum": ["ReplaceComplete", "ArchiveInTable", "MergeByUnique", "Append"]
+            "enum": [
+              "ReplaceComplete",
+              "ArchiveInTable",
+              "MergeByUnique",
+              "Append"
+            ]
           }
         },
+        "oneOf": [
+          {
+            "properties": {
+              "Type": {
+                "const": "sql"
+              },
+              "ConnectionName": {
+                "type": "string"
+              },
+              "TableName": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "ConnectionName",
+              "TableName"
+            ]
+          },
+          {
+            "properties": {
+              "Type": {
+                "const": "csv"
+              },
+              "FilePath": {
+                "type": "string"
+              },
+              "FilePrefix": {
+                "type": "string"
+              },
+              "Delimiter": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "FilePath",
+              "FilePrefix",
+              "Delimiter"
+            ]
+          }
+        ],
         "required": [
-          "Type", 
+          "Type",
           "UpdateStrategy"
         ]
       }
@@ -52,7 +157,10 @@
                 "items": {
                   "type": "string",
                   "enum": [
-                    "Unique"
+                    "Unique",
+                    "NonNull",
+                    "PrimaryKey",
+                    "DuplicateIdentifier"
                   ]
                 }
               },
@@ -73,7 +181,8 @@
                   "Decimal",
                   "Int",
                   "DateTime",
-                  "Date"
+                  "Date",
+                  "Boolean"
                 ]
               }
             },
@@ -99,6 +208,21 @@
         "required": [
           "Type",
           "Name"
+        ],
+        "oneOf": [
+          {
+            "properties": {
+              "Type": {
+                "const": "regex_replace"
+              },
+              "SelectRegex": {
+                "type": "string"
+              },
+              "ReplaceRegex": {
+                "type": "string"
+              }
+            }
+          }
         ]
       }
     }

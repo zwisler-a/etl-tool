@@ -1,5 +1,5 @@
 ﻿using System.Data;
-using EtlApp.Domain.Config;
+using EtlApp.Domain.Config.Pipeline;
 
 namespace EtlApp.Domain.Dto;
 

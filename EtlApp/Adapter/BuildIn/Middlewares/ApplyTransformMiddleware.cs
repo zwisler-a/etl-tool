@@ -3,15 +3,13 @@ using System.Diagnostics;
 using EtlApp.Domain.Config;
 using EtlApp.Domain.Config.Pipeline;
 using EtlApp.Domain.Dto;
-using Microsoft.Extensions.Logging;
 
 namespace EtlApp.Adapter.BuildIn.Middlewares;
 
 public class ApplyTransformMiddlewareConfig : MiddlewareConfig;
 
-public class ApplyTransformMiddleware(ApplyTransformMiddlewareConfig config, PipelineContext context) : Domain.Connection.Middleware
+public class ApplyTransformMiddleware(ApplyTransformMiddlewareConfig _, PipelineContext context) : Domain.Connection.Middleware
 {
-    private readonly ILogger _logger = Logging.LoggerFactory.CreateLogger<DetectTypeMiddleware>();
 
     protected override ReportData Process(ReportData reportData)
     {

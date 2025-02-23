@@ -1,6 +1,6 @@
 ﻿using EtlApp.Domain.Dto;
 
-namespace EtlApp.Domain.Target;
+namespace EtlApp.Domain.Connection;
 
 public interface ITargetConnection : IObserver<ReportData>
 {

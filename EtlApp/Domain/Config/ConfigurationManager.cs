@@ -1,5 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
+using EtlApp.Domain.Config.Pipeline;
+using EtlApp.Domain.Config.Pipeline.Converter;
 
 namespace EtlApp.Domain.Config;
 

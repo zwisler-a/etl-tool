@@ -1,8 +1,6 @@
-﻿using EtlApp.Adapter.BuildIn.Middleware;
-using EtlApp.Adapter.BuildIn.Middlewares;
-using EtlApp.Domain.Config.Pipeline;
+﻿using EtlApp.Adapter.BuildIn.Middlewares;
 
-namespace EtlApp.Domain.Config;
+namespace EtlApp.Domain.Config.Pipeline;
 
 public class PipelineConfiguration
 {

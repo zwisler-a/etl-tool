@@ -1,5 +1,4 @@
-﻿using EtlApp.Domain.Config;
-using EtlApp.Domain.Dto;
+﻿using EtlApp.Domain.Dto;
 using Microsoft.Extensions.Logging;
 
 namespace EtlApp.Domain.Execution;

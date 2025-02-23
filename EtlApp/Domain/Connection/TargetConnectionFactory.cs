@@ -1,6 +1,5 @@
-﻿using EtlApp.Domain.Config;
+﻿using EtlApp.Domain.Config.Pipeline;
 using EtlApp.Domain.Dto;
-using EtlApp.Domain.Target;
 using EtlApp.Util;
 
 namespace EtlApp.Domain.Connection;

@@ -1,26 +1,21 @@
 ﻿using System.Data.Common;
-using EtlApp.Domain.Config;
+using EtlApp.Domain.Connection;
 using EtlApp.Domain.Dto;
-using EtlApp.Domain.Target;
 using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Logging;
 using static EtlApp.Adapter.Sql.SqlCommands;
 
 namespace EtlApp.Adapter.Sql;
 
 public class SqlTargetConnection : ITargetConnection
 {
-    private readonly ILogger _logger = Logging.LoggerFactory.CreateLogger<SqlTargetConnection>();
     private readonly SqlTargetConfig _config;
-    private readonly PipelineContext _context;
     private readonly DbConnection _dbConnection;
 
     public SqlTargetConnection(SqlTargetConfig config, PipelineContext context)
     {
         _config = config;
-        _context = context;
 
-        var con = _context.DatabaseManager.GetConnection(_config.ConnectionName) ??
+        var con = context.DatabaseManager.GetConnection(_config.ConnectionName) ??
                   throw new Exception("Unknown connection");
         _dbConnection = new SqlConnection(con.ConnectionString);
     }

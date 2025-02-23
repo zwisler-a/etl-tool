@@ -1,5 +1,4 @@
 ﻿using EtlApp.Domain.Dto;
-using EtlApp.Domain.Execution;
 
 namespace EtlApp.Domain.Connection;
 

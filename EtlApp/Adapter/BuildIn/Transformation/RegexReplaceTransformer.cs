@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Text.RegularExpressions;
-using EtlApp.Domain.Config;
+using EtlApp.Domain.Config.Pipeline;
 using EtlApp.Domain.Connection;
 
 namespace EtlApp.Adapter.BuildIn.Transformation;

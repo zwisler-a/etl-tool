@@ -1,11 +1,10 @@
 ﻿{
+  "$schema": "../Schema/application_config.schema.json",
   "database": [
     {
       "Type": "sql",
       "ConnectionString": "Server=localhost;Database=TestDb;User Id=sa;Password=ilujhasdhas73679zhansdjASDalsdjhasjdn;Encrypt=False;"
     }
   ],
-  "ConfigFolder": "C:\\Users\\Alex\\RiderProjects\\EtlApp\\EtlApp\\TestConfig",
-  "LogLevel": "Information"
-  
+  "ConfigFolder": "C:\\Users\\Alex\\RiderProjects\\EtlApp\\EtlApp\\TestConfig"
 }

@@ -1,12 +1,14 @@
 ﻿using CommandLine;
-using EtlApp;
 using EtlApp.Adapter.BuildIn;
 using EtlApp.Adapter.Csv;
 using EtlApp.Adapter.Sql;
 using EtlApp.Domain.Config;
+using EtlApp.Domain.Config.Pipeline;
 using EtlApp.Domain.Execution;
 using EtlApp.Domain.Module;
 using Microsoft.Extensions.Logging;
+
+namespace EtlApp;
 
 class Program
 {
@@ -16,8 +18,8 @@ class Program
             .WithParsed(options =>
             {
                 ConfigurationManager.ConfigFilePath = options.ApplicationConfigPath;
-                // "C:\\Users\\Alex\\RiderProjects\\EtlApp\\EtlApp\\TestConfig\\application_config.json";
-
+                if (options.Verbose)
+                    Logging.SetLoggingLevel(LogLevel.Debug);
                 ILogger<Program> logger = Logging.LoggerFactory.CreateLogger<Program>();
 
                 var moduleRegistry = new ModuleRegistry();
@@ -41,12 +43,11 @@ class Program
                     );
                     return pipeline;
                 });
-
-                foreach (var pipeline in pipelines)
+                Parallel.ForEach(pipelines, pipeline =>
                 {
                     logger.LogDebug($"Processing pipeline: {pipeline}");
                     pipeline.Run();
-                }
+                });
             });
     }
 }

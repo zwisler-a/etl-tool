@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using EtlApp.Domain.Config.Pipeline;
+using Microsoft.Extensions.Logging;
 
 namespace EtlApp.Domain.Config;
 

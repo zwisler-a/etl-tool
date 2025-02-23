@@ -7,7 +7,7 @@ using EtlApp.Domain.Dto;
 using Microsoft.Extensions.Logging;
 
 
-namespace EtlApp.Adapter.BuildIn.Middleware;
+namespace EtlApp.Adapter.BuildIn.Middlewares;
 
 public class CastTypeMiddlewareConfig : MiddlewareConfig
 {
@@ -96,7 +96,7 @@ public class CastTypeMiddleware(CastTypeMiddlewareConfig config, PipelineContext
         bool containsDot = stringValue.Contains(".");
         if (containsComma && containsDot)
         {
-            _logger?.LogError("Ambiguous decimal separator, please specify culture!");
+            _logger.LogError("Ambiguous decimal separator, please specify culture!");
             throw new FormatException("Ambiguous decimal separator.");
         }
 

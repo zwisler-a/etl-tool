@@ -1,6 +1,4 @@
-﻿using System.Text.Json;
-using System.Text.Json.Serialization;
-using EtlApp.Util;
+﻿using EtlApp.Util;
 
-namespace EtlApp.Domain.Config;
+namespace EtlApp.Domain.Config.Pipeline.Converter;
 public class DatabaseConfigConverter: JsonDerivedTypeConverter<DatabaseConfig>;

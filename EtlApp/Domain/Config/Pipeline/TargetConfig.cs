@@ -1,7 +1,8 @@
 ﻿using System.Text.Json.Serialization;
+using EtlApp.Domain.Config.Pipeline.Converter;
 using EtlApp.Domain.Dto;
 
-namespace EtlApp.Domain.Config;
+namespace EtlApp.Domain.Config.Pipeline;
 
 [JsonConverter(typeof(TargetConfigConverter))]
 public class TargetConfig

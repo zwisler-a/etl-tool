@@ -1,12 +1,8 @@
-﻿using System.Collections;
-using EtlApp.Domain.Config;
+﻿using EtlApp.Domain.Config;
+using EtlApp.Domain.Config.Pipeline.Converter;
 using EtlApp.Domain.Connection;
-using EtlApp.Domain.Database;
 using EtlApp.Domain.Dto;
-using EtlApp.Domain.Execution;
 using EtlApp.Domain.Module;
-using EtlApp.Domain.Source;
-using EtlApp.Domain.Target;
 using Microsoft.Data.SqlClient;
 
 namespace EtlApp.Adapter.Sql;

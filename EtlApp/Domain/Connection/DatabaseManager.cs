@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Data.Common;
 
-namespace EtlApp.Domain.Database
+namespace EtlApp.Domain.Connection
 {
     public class DatabaseManager
     {

@@ -1,0 +1,70 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "database": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "Type": {
+            "type": "string",
+            "enum": [
+              "sql"
+            ]
+          },
+          "ConnectionString": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "Type",
+          "ConnectionString"
+        ]
+      }
+    },
+    "ConfigFolder": {
+      "type": "string"
+    },
+    "transformer": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "Type": {
+            "type": "string"
+          },
+          "Name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "Type",
+          "Name"
+        ],
+        "oneOf": [
+          {
+            "properties": {
+              "Type": {
+                "const": "regex_replace"
+              },
+              "SelectRegex": {
+                "type": "string"
+              },
+              "ReplaceRegex": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "required": [
+    "ConfigFolder"
+  ]
+}

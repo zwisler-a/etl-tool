@@ -1,5 +1,4 @@
-﻿using EtlApp.Adapter.BuildIn.Middleware;
-using EtlApp.Adapter.BuildIn.Middlewares;
+﻿using EtlApp.Adapter.BuildIn.Middlewares;
 using EtlApp.Adapter.BuildIn.Transformation;
 using EtlApp.Domain.Config;
 using EtlApp.Domain.Config.Pipeline.Converter;
@@ -14,7 +13,7 @@ public class BuildInModule : Module
     public override void RegisterTransformer(TransformerFactory transformerFactory)
     {
         TransformerConfigConverter.Register<RegexReplaceTransformerConfig>("regex_replace");
-        transformerFactory.Register((RegexReplaceTransformerConfig config, PipelineContext context) =>
+        transformerFactory.Register((RegexReplaceTransformerConfig config, PipelineContext _) =>
             new RegexReplaceTransformer(config));
     }
 

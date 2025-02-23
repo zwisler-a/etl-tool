@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using EtlApp.Domain.Config;
 using EtlApp.Domain.Connection;
-using EtlApp.Domain.Target;
 using EtlApp.Util.Observable;
 using Microsoft.Extensions.Logging;
 
@@ -9,9 +8,14 @@ namespace EtlApp.Domain.Execution;
 
 public class Pipeline
 {
+    
+    private static int _counter = 0;
+    private int _id;
+    
     private readonly List<ISourceConnection> _sources;
     private readonly List<ITargetConnection> _targets;
     private readonly List<IMiddleware> _middlewares;
+    
 
     private readonly ILogger _logger;
 
@@ -21,7 +25,8 @@ public class Pipeline
         _middlewares = middlewares;
         _sources = sources;
         _targets = targets;
-        _logger = Logging.LoggerFactory.CreateLogger(ToString());
+        _id = Interlocked.Increment(ref _counter);
+        _logger = Logging.LoggerFactory.CreateLogger($"{ToString()}[{_id}]");
     }
 
     public void Run()

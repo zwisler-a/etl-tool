@@ -5,7 +5,7 @@
       "Type": "sql",
       "ConnectionName": "sql",
       "TableName": "data",
-      "BatchSize": 10000
+      "BatchSize": 1000
     }
   ],
   "target": [
@@ -15,6 +15,24 @@
       "FilePrefix": "generated_data",
       "Delimiter": ",",
       "UpdateStrategy": "ReplaceComplete"
+    }
+  ],
+  "mapping": {
+    "Mappings": [
+      {
+        "SourceName": "Column_1",
+        "Transform": [
+          "replace"
+        ]
+      }
+    ]
+  },
+  "transformer": [
+    {
+      "Type": "regex_replace",
+      "Name": "replace",
+      "ReplaceRegex": "1",
+      "SelectRegex": "1"
     }
   ]
 }

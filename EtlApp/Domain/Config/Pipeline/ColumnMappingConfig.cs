@@ -1,6 +1,6 @@
 ﻿using EtlApp.Domain.Dto;
 
-namespace EtlApp.Domain.Config;
+namespace EtlApp.Domain.Config.Pipeline;
 
 public class ColumnMappingConfig
 {

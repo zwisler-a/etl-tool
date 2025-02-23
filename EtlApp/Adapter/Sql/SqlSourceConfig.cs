@@ -1,4 +1,4 @@
-﻿using EtlApp.Domain.Config;
+﻿using EtlApp.Domain.Config.Pipeline;
 
 namespace EtlApp.Adapter.Sql;
 

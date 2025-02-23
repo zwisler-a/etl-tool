@@ -1,8 +1,8 @@
 ﻿using System.Data;
 using EtlApp.Domain.Config;
+using EtlApp.Domain.Config.Pipeline;
 using EtlApp.Domain.Connection;
 using EtlApp.Domain.Dto;
-using EtlApp.Domain.Source;
 using EtlApp.Util.Observable;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;

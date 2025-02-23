@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using EtlApp.Domain.Dto;
-
-namespace EtlApp.Util.Observable;
+﻿namespace EtlApp.Util.Observable;
 
 public interface IPipeable<in T, out TO> : IObservable<TO>, IObserver<T>;
 

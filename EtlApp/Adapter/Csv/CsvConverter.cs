@@ -15,10 +15,10 @@ public class CustomDateTimeConverter : ITypeConverter
         _format = format;
     }
 
-    public object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData) 
+    public object ConvertFromString(string? text, IReaderRow row, MemberMapData memberMapData) 
         => DateTime.ParseExact(text, _format, CultureInfo.InvariantCulture);
 
-    public string ConvertToString(object value, IWriterRow row, MemberMapData memberMapData)
+    public string ConvertToString(object? value, IWriterRow row, MemberMapData memberMapData)
         => value is DateTime dt ? dt.ToString(_format, CultureInfo.InvariantCulture) : string.Empty;
 }
 

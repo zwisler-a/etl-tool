@@ -1,4 +1,4 @@
-﻿namespace EtlApp.Domain.Config;
+﻿namespace EtlApp.Domain.Config.Pipeline;
 
 public class MappingConfig
 {

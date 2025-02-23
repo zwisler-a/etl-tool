@@ -6,7 +6,10 @@
       "FilePath": "C:\\Users\\Alex\\RiderProjects\\EtlApp\\EtlApp\\TestFiles",
       "FilePrefix": "generated_data",
       "Delimiter": ",",
-      "BatchSize": 10000
+      "BatchSize": 10000,
+      "MoveToArchive": true,
+      "FailedArchivePath": "C:\\Users\\Alex\\RiderProjects\\EtlApp\\EtlApp\\TestFiles\\failed",
+      "SuccessArchivePath": "C:\\Users\\Alex\\RiderProjects\\EtlApp\\EtlApp\\TestFiles\\success"
     }
   ],
   "target": [
