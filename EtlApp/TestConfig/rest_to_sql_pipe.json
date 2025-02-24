@@ -1,0 +1,28 @@
+﻿{
+  "$schema": "../Schema/pipeline.schema.json",
+  "source": [
+    {
+      "Type": "rest",
+      "Endpoint": "/posts",
+      "BaseUrl": "https://jsonplaceholder.typicode.com"
+    }
+  ],
+  "target": [
+    {
+      "Type": "sql",
+      "ConnectionName": "sql",
+      "TableName": "rest_data",
+      "UpdateStrategy": "ReplaceComplete"
+    }
+  ],
+  "mapping": [
+    {
+      "SourceName": "id",
+      "Modifiers": ["Ignore"]
+    },
+    {
+      "SourceName": "body",
+      "TargetName": "content"
+    }
+  ]
+}

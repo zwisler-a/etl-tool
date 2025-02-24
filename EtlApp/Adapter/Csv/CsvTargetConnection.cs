@@ -2,6 +2,7 @@
 using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
+using EtlApp.Domain.Config.Pipeline;
 using EtlApp.Domain.Connection;
 using EtlApp.Domain.Dto;
 
@@ -35,16 +36,17 @@ public class CsvTargetConnection : ITargetConnection
         _csv.Context.TypeConverterCache.AddConverter<DateTime>(new CustomDateTimeConverter("yyyy-MM-dd HH:mm:ss"));
         _csv.Context.TypeConverterCache.AddConverter<DateOnly>(new CustomDateOnlyConverter("yyyy-MM-dd"));
     }
-    
-    
+
+
     public void OnNext(ReportData report)
     {
         if (_firstCall)
         {
-            foreach (DataColumn column in report.Data.Columns)
+            foreach (var (column, config) in report.Columns)
             {
-                _csv.WriteField(column.ColumnName);
+                _csv.WriteField(config.TargetName);
             }
+
             _csv.NextRecord();
             _firstCall = false;
         }
@@ -59,6 +61,7 @@ public class CsvTargetConnection : ITargetConnection
 
             _csv.NextRecord();
         }
+
         _csv.Flush();
     }
 
@@ -69,5 +72,4 @@ public class CsvTargetConnection : ITargetConnection
     public void OnError(Exception error)
     {
     }
-    
 }

@@ -9,7 +9,7 @@ namespace EtlApp.Domain.Execution;
 public class PipelineBuilder(ModuleRegistry moduleRegistry)
 {
     public Pipeline Build(List<SourceConfig> sourceConfig, List<TargetConfig> targetConfig,
-        List<TransformerConfig> transformerConfigs, MappingConfig mappingConfig,
+        List<TransformerConfig> transformerConfigs, List<ColumnMappingConfig> mappingConfig,
         List<MiddlewareConfig> middlewareConfig)
     {
         var globalTransformer = ConfigurationManager.Config.Transformer ?? [];

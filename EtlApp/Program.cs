@@ -1,6 +1,7 @@
 ﻿using CommandLine;
 using EtlApp.Adapter.BuildIn;
 using EtlApp.Adapter.Csv;
+using EtlApp.Adapter.Rest;
 using EtlApp.Adapter.Sql;
 using EtlApp.Domain.Config;
 using EtlApp.Domain.Config.Pipeline;
@@ -27,6 +28,7 @@ class Program
                 moduleRegistry.RegisterModule(new BuildInModule());
                 moduleRegistry.RegisterModule(new CsvModule());
                 moduleRegistry.RegisterModule(new SqlModule());
+                moduleRegistry.RegisterModule(new RestModule());
 
                 var files = Directory.GetFiles(ConfigurationManager.Config.ConfigFolder,
                     options.IncludePipeline ?? "*.json");
@@ -38,7 +40,7 @@ class Program
                         config.Source,
                         config.Target,
                         config.Transformer,
-                        config.Mapping ?? new MappingConfig { Mappings = [] },
+                        config.Mapping ?? [],
                         config.Middleware
                     );
                     return pipeline;

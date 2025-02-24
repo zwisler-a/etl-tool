@@ -44,7 +44,7 @@ public class DetectTypeMiddleware(DetectTypeMiddlewareConfig config, PipelineCon
         {
             var value = row[columnName];
             if (string.IsNullOrWhiteSpace(value.ToString())) continue;
-            
+
             // Check for each type
             if (!TryParseInt(value)) allInts = false;
             if (!TryParseDouble(value)) allDoubles = false;
@@ -68,7 +68,7 @@ public class DetectTypeMiddleware(DetectTypeMiddlewareConfig config, PipelineCon
 
     private bool TryParseInt(object value)
     {
-        return value is int || (value is string str && int.TryParse(str, out _));
+        return value is int || value is long || (value is string str && int.TryParse(str, out _));
     }
 
     private bool TryParseDouble(object value)

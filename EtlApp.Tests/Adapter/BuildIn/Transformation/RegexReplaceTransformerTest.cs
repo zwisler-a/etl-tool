@@ -19,4 +19,17 @@ public class RegexReplaceTransformerTest
         });
         Assert.That(transformer.Transform("Hello"), Is.EqualTo("1"));
     }
+    
+    [Test]
+    public void TestCaptureGroups()
+    {
+        var transformer = new RegexReplaceTransformer(new RegexReplaceTransformerConfig
+        {
+            Name = "test",
+            Type = "test",
+            SelectRegex = "(\\d+)a(\\d+)",
+            ReplaceRegex = "$2b$1",
+        });
+        Assert.That(transformer.Transform("42a1337"), Is.EqualTo("1337b42"));
+    }
 }

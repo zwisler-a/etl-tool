@@ -31,12 +31,8 @@ public class SqlSourceConnection(SqlSourceConfig config, PipelineContext context
         for (var i = 0; i < reader.FieldCount; i++)
         {
             var columnName = reader.GetName(i);
-            reportData.Columns[columnName] = new ColumnMappingConfig
-            {
-                TargetName = columnName,
-                SourceName = columnName,
-                SourceType = SqlTypes.DataTypeToSqlType.GetValueOrDefault(reader.GetFieldType(i)!)
-            };
+            reportData.Columns[columnName] = context.GetColumnMapping(columnName,
+                SqlTypes.DataTypeToSqlType.GetValueOrDefault(reader.GetFieldType(i)!));
             reportData.Data.Columns.Add(columnName);
         }
 

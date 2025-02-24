@@ -30,6 +30,32 @@
           {
             "properties": {
               "Type": {
+                "const": "rest"
+              },
+              "Jslt": {
+                "type": "string"
+              },
+              "BaseUrl": {
+                "type": "string"
+              },
+              "Endpoint": {
+                "type": "string"
+              },
+              "Method": {
+                "type": "string"
+              },
+              "Headers": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "BaseUrl",
+              "Endpoint"
+            ]
+          },
+          {
+            "properties": {
+              "Type": {
                 "const": "csv"
               },
               "FilePath": {
@@ -142,55 +168,51 @@
       }
     },
     "mapping": {
-      "type": "object",
-      "properties": {
-        "Mappings": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "SourceName": {
-                "type": "string"
-              },
-              "Modifiers": {
-                "type": "array",
-                "items": {
-                  "type": "string",
-                  "enum": [
-                    "Unique",
-                    "NonNull",
-                    "PrimaryKey",
-                    "DuplicateIdentifier"
-                  ]
-                }
-              },
-              "Transform": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              },
-              "TargetName": {
-                "type": "string"
-              },
-              "SourceType": {
-                "type": "string",
-                "enum": [
-                  "Undefined",
-                  "String",
-                  "Decimal",
-                  "Int",
-                  "DateTime",
-                  "Date",
-                  "Boolean"
-                ]
-              }
-            },
-            "required": [
-              "SourceName"
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "SourceName": {
+            "type": "string"
+          },
+          "Modifiers": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "Unique",
+                "NonNull",
+                "PrimaryKey",
+                "DuplicateIdentifier",
+                "Ignore"
+              ]
+            }
+          },
+          "Transform": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "TargetName": {
+            "type": "string"
+          },
+          "SourceType": {
+            "type": "string",
+            "enum": [
+              "Undefined",
+              "String",
+              "Decimal",
+              "Int",
+              "DateTime",
+              "Date",
+              "Boolean"
             ]
           }
-        }
+        },
+        "required": [
+          "SourceName"
+        ]
       }
     },
     "transformer": {

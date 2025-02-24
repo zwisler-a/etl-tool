@@ -10,6 +10,19 @@ public static class ObservableUtils
 
     public static ObservablePipe<T> Concat<T>(List<IPipeable<T, T>> observables)
     {
+        if (observables.Count == 0)
+        {
+            var observable = new Subject<T>();
+            var observer = new LambdaObserver<T>(
+                observable.Next, observable.Error, observable.Complete
+            );
+            return new ObservablePipe<T>
+            {
+                Observer = observer,
+                Observable = observable
+            };
+        }
+
         var current = observables.First();
         foreach (var observable in observables)
         {

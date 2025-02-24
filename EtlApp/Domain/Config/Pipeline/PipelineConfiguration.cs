@@ -16,5 +16,5 @@ public class PipelineConfiguration
         new ValidateTypeMiddlewareConfig { Type = "type_validation" }
     ];
 
-    public MappingConfig? Mapping { get; set; }
+    public List<ColumnMappingConfig>? Mapping { get; set; }
 }

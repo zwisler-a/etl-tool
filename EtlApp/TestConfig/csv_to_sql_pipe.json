@@ -3,13 +3,13 @@
   "source": [
     {
       "Type": "csv",
-      "FilePath": "C:\\Users\\Alex\\RiderProjects\\EtlApp\\EtlApp\\TestFiles",
+      "FilePath": "..\\..\\..\\..\\EtlApp\\TestFiles",
       "FilePrefix": "generated_data",
       "Delimiter": ",",
       "BatchSize": 10000,
-      "MoveToArchive": true,
-      "FailedArchivePath": "C:\\Users\\Alex\\RiderProjects\\EtlApp\\EtlApp\\TestFiles\\failed",
-      "SuccessArchivePath": "C:\\Users\\Alex\\RiderProjects\\EtlApp\\EtlApp\\TestFiles\\success"
+      "MoveToArchive": false,
+      "FailedArchivePath": "..\\..\\..\\..\\EtlApp\\TestFiles\\failed",
+      "SuccessArchivePath": "..\\..\\..\\..\\EtlApp\\TestFiles\\success"
     }
   ],
   "target": [

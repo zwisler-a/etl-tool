@@ -4,6 +4,7 @@ public enum ColumnModifiers
 {
     NonNull,
     Unique,
+    Ignore,
 
     /// <summary>
     /// Identifies the column to be used as a primary key if necessary.

@@ -102,9 +102,9 @@ public static class SqlCommands
         bulkCopy.BatchSize = 1000;
         bulkCopy.NotifyAfter = 1000;
 
-        foreach (var columnName in report.Columns.Keys)
+        foreach (var (columnName, config) in report.Columns)
         {
-            bulkCopy.ColumnMappings.Add(columnName, columnName); // Map columns
+            bulkCopy.ColumnMappings.Add(columnName, config.TargetName); // Map columns
         }
 
         var totalRows = report.Data.Rows.Count;

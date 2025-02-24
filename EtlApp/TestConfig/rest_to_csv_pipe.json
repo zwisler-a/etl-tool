@@ -1,0 +1,29 @@
+﻿{
+  "$schema": "../Schema/pipeline.schema.json",
+  "source": [
+    {
+      "Type": "rest",
+      "Endpoint": "/posts",
+      "BaseUrl": "https://jsonplaceholder.typicode.com"
+    }
+  ],
+  "target": [
+    {
+      "Type": "csv",
+      "FilePath": "..\\..\\..\\..\\EtlApp\\TestFiles",
+      "FilePrefix": "generated_data",
+      "Delimiter": ",",
+      "UpdateStrategy": "ReplaceComplete"
+    }
+  ],
+  "mapping": [
+    {
+      "SourceName": "id",
+      "Modifiers": ["Ignore"]
+    },
+    {
+      "SourceName": "body",
+      "TargetName": "content"
+    }
+  ]
+}

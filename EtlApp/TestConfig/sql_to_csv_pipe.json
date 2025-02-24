@@ -11,7 +11,7 @@
   "target": [
     {
       "Type": "csv",
-      "FilePath": "C:\\Users\\Alex\\RiderProjects\\EtlApp\\EtlApp\\TestFiles",
+      "FilePath": "..\\..\\..\\EtlApp\\TestFiles",
       "FilePrefix": "generated_data",
       "Delimiter": ",",
       "UpdateStrategy": "ReplaceComplete"

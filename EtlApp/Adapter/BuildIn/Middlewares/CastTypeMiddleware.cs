@@ -22,24 +22,37 @@ public class CastTypeMiddleware(CastTypeMiddlewareConfig config, PipelineContext
     {
         var newDataTable = new DataTable();
         var columns = reportData.Columns.ToList();
-    
+
         foreach (var (columnName, columnConfig) in columns)
+        {
+            if (columnConfig.Modifiers?.Contains(ColumnModifiers.Ignore) ?? false)
+            {
+                reportData.Columns.Remove(columnName);
+                continue;
+            }
+
             newDataTable.Columns.Add(columnName, GetColumnType(columnConfig.SourceType));
-    
+        }
+
+
         newDataTable.BeginLoadData();
         foreach (DataRow originalRow in reportData.Data.Rows)
         {
             var newRow = newDataTable.NewRow();
             foreach (var (columnName, columnConfig) in columns)
+            {
+                if (columnConfig.Modifiers?.Contains(ColumnModifiers.Ignore) ?? false) continue;
                 newRow[columnName] = ConvertValue(originalRow[columnName], columnConfig.SourceType);
+            }
+
             newDataTable.Rows.Add(newRow);
         }
-    
+
         newDataTable.EndLoadData();
         reportData.Data.Clear();
         return reportData with { Data = newDataTable };
     }
-    
+
     private Type GetColumnType(ColumnType targetType) => targetType switch
     {
         ColumnType.Int => typeof(int),

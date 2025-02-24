@@ -1,0 +1,5 @@
+﻿{
+  "$schema": "../../EtlApp/Schema/application_config.schema.json",
+  "database": [],
+  "ConfigFolder": "../../../TestConfig/pipelines"
+}

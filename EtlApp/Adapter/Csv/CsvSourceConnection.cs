@@ -50,7 +50,7 @@ public class CsvSourceConnection(CsvSourceConfig config, PipelineContext context
                         }
 
                         columnTypes = dt.Columns.Cast<DataColumn>()
-                            .ToDictionary(c => c.ColumnName, c => GetColumnType(c, context));
+                            .ToDictionary(c => c.ColumnName, c => context.GetColumnMapping(c.ColumnName));
                         initialized = true;
                     }
 
@@ -78,6 +78,7 @@ public class CsvSourceConnection(CsvSourceConfig config, PipelineContext context
 
                     Next(report);
                 }
+
                 reader.Close();
                 if (config.MoveToArchive)
                 {
@@ -112,13 +113,5 @@ public class CsvSourceConnection(CsvSourceConfig config, PipelineContext context
         var successArchivePath = Path.Combine(config.SuccessArchivePath, Path.GetFileName(file));
         Directory.CreateDirectory(config.SuccessArchivePath);
         File.Move(file, successArchivePath, true);
-    }
-
-    private static ColumnMappingConfig GetColumnType(DataColumn column, PipelineContext context)
-    {
-        var source =
-            context.MappingConfig.Mappings.Find(mappingConfig => mappingConfig.SourceName.Equals(column.ColumnName));
-        return source ?? new ColumnMappingConfig
-            { SourceName = column.ColumnName, SourceType = ColumnType.Undefined, TargetName = column.ColumnName };
     }
 }
