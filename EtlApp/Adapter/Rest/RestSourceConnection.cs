@@ -11,7 +11,7 @@ namespace EtlApp.Adapter.Rest;
 
 public class RestSourceConnectionConfig : SourceConfig
 {
-    public JsonValue? Jslt;
+    public string? Jslt { get; set; }
     public required string BaseUrl { get; set; }
     public required string Endpoint { get; set; }
     public string Method { get; set; } = "GET";

@@ -3,7 +3,7 @@
   "source": [
     {
       "Type": "rest",
-      "Endpoint": "/posts",
+      "Endpoint": "/todos",
       "BaseUrl": "https://jsonplaceholder.typicode.com"
     }
   ],
